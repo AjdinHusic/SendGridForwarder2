@@ -12,17 +12,18 @@ public class EmailService : IEmailService
         _sendGridApiKey = sendGridApiKey;
     }
     
-    public record ForwardEmailRequest(string From, string To, string Subject, string Body);
+    public record ForwardEmailRequest(string From, string To, string ReplyTo,  string Subject, string Body);
 
     public async Task<Response> ForwardEmail(ForwardEmailRequest request)
     {
-        var (from, to, subject, body) = request;
+        var (from, to, replyTo, subject, body) = request;
         
         var client = new SendGridClient(_sendGridApiKey);
         var msg = new SendGridMessage
         {
             From = new EmailAddress(from),
             Subject = subject,
+            ReplyTo = new EmailAddress(replyTo),
             PlainTextContent = body,
             HtmlContent = body
         };

@@ -1,10 +1,9 @@
+using System.Threading.RateLimiting;
 using DotNetEnv;
 using SendGridForwarder2;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-//var a = Env.Load(Directory.GetCurrentDirectory());
 Env.Load();
 Env.TraversePath().Load();
 
@@ -13,6 +12,20 @@ var sendGridApiKey = Env.GetString("SENDGRID_API_KEY");
 
 if (string.IsNullOrWhiteSpace(sendGridApiKey)) throw new Exception("Missing environment variable: SENDGRID_API_KEY");
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = 429;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? httpContext.Request.Headers.Host.ToString(),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = Env.GetInt("RATE_LIMIT", 5),
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
 builder.Services.AddScoped<IEmailService, EmailService>(x => new EmailService(sendGridApiKey));
 
 builder.Services.AddControllers();
@@ -31,6 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRateLimiter();
 app.UseAuthorization();
 
 app.MapControllers();
