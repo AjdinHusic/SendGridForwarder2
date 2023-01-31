@@ -27,6 +27,7 @@ public static class WebApplicationExtensions
 
             if (string.IsNullOrWhiteSpace(route)) continue;
 
+            Console.WriteLine($"added route {route}");
             app.MapPost(route, async (c) =>
             {
                 var bodyContent = await c.Request.ReadFromJsonAsync<ForwardEmailRequest>();
