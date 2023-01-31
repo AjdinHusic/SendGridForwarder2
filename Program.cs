@@ -50,7 +50,7 @@ var app = builder.Build();
 //     app.UseSwagger();
 //     app.UseSwaggerUI();
 // }
-
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
