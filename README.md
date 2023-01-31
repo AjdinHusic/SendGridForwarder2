@@ -27,6 +27,7 @@ SENDGRID_API_KEY=your_api_key_here
 # Add preset custom route, all the variables below are optional except for 'route=...;'
 MAIL_PRESET_0="route=/contact;from=test@example.com;to=recipient@example.com;replyTo=info@example.com;subject=Contact;"
 
+# Set this to true to open an endpoint /email, that accepts all parameters including 'from' property. (Not recommended)
 ALLOW_OPEN_EMAIL_ENDPOINT=false
 ```
 2. Send a post request:
