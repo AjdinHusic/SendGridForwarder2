@@ -20,6 +20,26 @@ A simple, open-source software application for sending emails using the SendGrid
 - You can place as many ROUTES as you want! just increment the index in `$"MAIL_PRESET_{index}"`. All parameters are optional except for `route=...;`
 - Run the application with either Docker or .NET 7!
 
+## How To Use
+1. set up your presets;
+```.env
+SENDGRID_API_KEY=your_api_key_here
+# Add preset custom route, all the variables below are optional except for 'route=...;'
+MAIL_PRESET_0="route=/contact;from=test@example.com;to=recipient@example.com;replyTo=info@example.com;subject=Contact;"
+
+ALLOW_OPEN_EMAIL_ENDPOINT=false
+```
+2. Send a post request:
+
+```
+POST http://server/contact 
+// (all parameters that are not set in the MAIL_PRESET_{index} value, are expected in the body of the request).
+BODY 
+{
+  "body": "<h1>Hello World</h1>"
+}
+```
+
 ## Built With
 .NET 7
 ASP.NET Core
