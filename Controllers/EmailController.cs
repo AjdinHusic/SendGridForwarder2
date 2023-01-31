@@ -14,7 +14,7 @@ public class EmailController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> ForwardMail(EmailService.ForwardEmailRequest request)
+    public async Task<IActionResult> ForwardMail(ForwardEmailRequest request)
     {
         var r = await _emailService.ForwardEmail(request);
         return Ok(r);

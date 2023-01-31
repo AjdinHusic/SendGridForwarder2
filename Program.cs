@@ -1,15 +1,14 @@
 using System.Threading.RateLimiting;
 using DotNetEnv;
 using SendGridForwarder2;
+using SendGridForwarder2.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
-Env.TraversePath().Load();
+var variables = Env.TraversePath().Load().ToDictionary();
 
 var sendGridApiKey = Env.GetString("SENDGRID_API_KEY");
-
-
 if (string.IsNullOrWhiteSpace(sendGridApiKey)) throw new Exception("Missing environment variable: SENDGRID_API_KEY");
 
 builder.Services.AddRateLimiter(options =>
@@ -30,23 +29,26 @@ builder.Services.AddScoped<IEmailService, EmailService>(x => new EmailService(se
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// builder.Services.AddEndpointsApiExplorer();
+// builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
 
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
 app.UseAuthorization();
 
+app.DisableEmailRouteIfDisallowed();
+app.MapEmailPresetsToEndpoints(variables);
 app.MapControllers();
+
 
 app.Run();

@@ -11,8 +11,6 @@ public class EmailService : IEmailService
     {
         _sendGridApiKey = sendGridApiKey;
     }
-    
-    public record ForwardEmailRequest(string From, string To, string ReplyTo,  string Subject, string Body);
 
     public async Task<Response> ForwardEmail(ForwardEmailRequest request)
     {
